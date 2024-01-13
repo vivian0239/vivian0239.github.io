@@ -1,17 +1,954 @@
-<!-- Project Page Template (project1.html, project2.html, etc.) -->
+<!-- Project Page Template (project1.html) -->
 <!DOCTYPE HTML>
 <html>
 <head>
-    <!-- Include necessary head elements -->
-    <title>Project 1</title>
+    <title>Wholesale Customers Clustering</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
     <!-- Additional styles or scripts specific to the project page can be added here -->
 </head>
-<body>
-    <!-- Your project content goes here -->
+<body class="is-preload">
 
-    <!-- Back to Portfolio Button -->
-    <a href="index.html#portfolio" class="button">Back to Portfolio</a>
+    <!-- Project Content -->
+    <div id="project-content" class="container">
 
-    <!-- Include necessary scripts -->
+        <!-- Project Title -->
+        <header>
+            <h2><strong>Wholesale Customers Clustering</strong></h2>
+        </header>
+
+        <!-- Project Description -->
+        <p>This project will use wholesale data with various categories to cluster the customers.
+            The data contains only different consumption categories. It is not labeled. It is <b><i>unsupervised</b></i> learning. The data download link is as below:
+            <a href="url">https://archive.ics.uci.edu/dataset/292/wholesale+customers</a> The data contains 8 columns (features), and 440 rows.
+The online code link is: <a href="url">https://colab.research.google.com/drive/11m_O-NoNKAJ2Az8PIiDA70YQnaZM8wIY?usp=sharing#scrollTo=12T4SasKTUTr</a><br>
+This project used k-mean, Hierarchical clustering, DBSCAN, GMM to do clustering.
+        </p>
+        
+        <!-- Project Output Pictures -->
+        <h3>Project visualization and comments</h3>
+        <div class="row">
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic12.png" class="image fit" alt="Output Picture 1" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic13.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic14.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic15.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic16.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic17.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic18.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic19.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic20.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic21.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <div class="col-12 col-12-mobile">
+                <img src="images/pic22.png" class="image fit" alt="Output Picture 2" />
+            </div>
+            <!-- Add more output pictures here -->
+        </div>
+
+
+        <!-- Project Code -->
+        <h3>Code Snippet</h3>
+        <pre>
+        read data
+        from google.colab import drive
+        drive.mount("/content/drive")
+        import pandas as pd
+        path = "/content/drive/MyDrive/Wholesale-customers-data.csv"
+        data = pd.read_csv(path)
+        print("data first 5 lines")
+        print(data.head(5))
+        print("\ndata shape")
+        print(data.shape)
+        print("\ndata info")
+        print(data.info)
+
+        Check if there is null data.
+
+        Check result: No null data.
+
+        print(data.isnull().sum())
+
+        Data visualizaton:
+
+        Histogram
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        i = 0
+        col_name = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen']
+        while i < 8:
+        random_color = np.random.rand(3)
+        plt.hist(data.iloc[:, i], color=random_color, edgecolor='k')
+        plt.xlabel('Value')
+        plt.ylabel('Frequency')
+        plt.title(f'Histogram of Column {col_name[i]}')
+        plt.show()
+        i += 1
+
+
+        Before plot, standardize the data.
+
+        Firstly plot all the features pairs plots matrix. Plot the heatmap of the correlation coefficients.
+
+        Then use PCA to reduce the dimension, plot the scree plot.
+
+        import numpy as np
+        from sklearn.decomposition import PCA
+        import pandas as pd
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        # Standardize the data
+        from sklearn.preprocessing import StandardScaler
+        scaler = StandardScaler()
+        standardized_data = scaler.fit_transform(data)
+
+        # Different data type after standardize
+        print(type(data))
+        print(type(standardized_data))
+        # <class 'pandas.core.frame.DataFrame'>
+        # <class 'numpy.ndarray'>
+
+        # Transfer numpy array to pandas datafram
+        df_std_data = pd.DataFrame(standardized_data, columns = col_name)
+
+        # Create the pairplot
+        sns.set(style='ticks')
+        sns.pairplot(df_std_data)
+        plt.show()
+
+        # # Create the PCA object and fit-transform the data
+        # pca = PCA(n_components=2)  # Reducing to 2 features
+        # X_pca = pca.fit_transform(standardized_data)
+
+        # # Output the explained variance ratio
+        # print("Explained Variance Ratio:", pca.explained_variance_ratio_)
+
+        # # Output the first two principal components
+        # print("Principal Components (Eigenvectors):", pca.components_)
+
+        # # # The transformed data with reduced dimensionality
+        # # print("Data after PCA:", X_pca)
+
+
+        import seaborn as sns
+        sns.heatmap(df_std_data.corr(), cmap="YlGnBu", annot=True)
+
+        Because this is a clustering project, don't need to drop high cor feature.
+
+
+        # Use PCA to get explained variance ration
+        pca1 = PCA(n_components=8)  #
+        X1_pca = pca1.fit_transform(standardized_data)
+        explained_variance = pca1.explained_variance_ratio_
+        explained_variance
+
+        # Plot scree plot
+        plt.figure(figsize=(8, 6))
+        plt.plot(range(1, len(explained_variance) + 1), np.cumsum(explained_variance), marker='o')
+        plt.xlabel('Number of Principal Components')
+        plt.ylabel('Cumulative Explained Variance')
+        plt.title('Scree Plot with Continuous Line Chart')
+        plt.grid(True)
+        plt.show()
+
+
+        the first 5 principal components explains approximately 90% of the total variance in the data. So use first five principal components.
+
+        # Create the PCA object and fit-transform the data
+        pca = PCA(n_components=5)  # Reducing to 5 features
+        X_pca = pca.fit_transform(standardized_data)
+
+        X_pca.shape
+
+        # get eigenvalues and eigenvectors
+        X = standardized_data
+        n_samples = X.shape[0]
+        pca = PCA()
+        X_transformed = pca.fit_transform(X)
+        X_centered = X - np.mean(X, axis=0)
+        cov_matrix = np.dot(X_centered.T, X_centered) / n_samples
+        eigenvalues = pca.explained_variance_
+        for eigenvalue, eigenvector in zip(eigenvalues, pca.components_):
+            #print(np.dot(eigenvector.T, np.dot(cov_matrix, eigenvector)))
+            print(eigenvalue)
+            print("--------------")
+            print(eigenvector)
+
+        X_pca_df = pd.DataFrame(X_pca) # transfer numpy.ndarray to np frame because ndarray has no cor
+        sns.heatmap(X_pca_df.corr(), cmap="YlGnBu", annot=True)
+
+        Now I got two data. One is the standardized data without pca (standardized_data),  another is the first 5 principal components from the standardized data (X_pca).   
+
+        Next I will do is to use different models to clustering using these two data.
+
+        # k-mean clustering using standardized data
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from sklearn.cluster import KMeans
+
+        kmeans = KMeans(n_clusters = 3)
+        kmeans.fit(standardized_data)
+
+        labels = kmeans.labels_
+
+        print(labels)
+        plt.hist(labels, bins = [-0.1,0.1,0.9,1.1,1.9,2.1])
+
+        # this code is to add labels to feature np.array as a column
+        type(labels)
+        labels.shape# has only one dimension, will get error in hstack, I reshape it to one column
+        standardized_data.shape
+        # Stack the second array as a new column in the first array
+        reshaped_label = labels.reshape(-1, 1)
+        st_label_add_form = np.hstack((standardized_data, reshaped_label))
+        st_label_add_form.shape
+
+        for categorical feature, do Pearson’s Chi-Square. It is a statistical hypothesis test for independence between categorical variables. First get crosstable(contingency_table), then do chi-square test. The degrees of freedom is defined as : (no. of rows – 1) * (no. of columns – 1)
+
+        #next is to use chi-square test to test which feature is most relative to labels
+        import numpy as np
+        from scipy.stats import chi2_contingency
+
+        feature_num = [0,1]
+        feature_p_values = []
+
+        col_name_lb = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen', 'label']
+        df_std_data_lb = pd.DataFrame(st_label_add_form, columns = col_name_lb)# here not use, but when do anova test, I used framed data(not np.array)
+        # for categorical feature
+        for i in feature_num:
+            crosstable = pd.crosstab(st_label_add_form[:, i],
+                                    st_label_add_form[:, -1],
+                                    margins = False)
+            print("the " + str(i) + "th crosstable:\n")
+            print(crosstable)
+            print("---------------------")
+            stat, p, dof, expected = chi2_contingency(crosstable)
+            feature_p_values.append(p)
+            # add anova test for continous case
+            # for 0th crosstable, histogram the other features to explain lable 1
+            # continues boxplot
+
+
+
+        feature_p_values
+
+        For numerical features do anova test. I have three labels, 0, 1, and 2. The purpose is to know for each feature is there a mean difference between each label. Also make boxplot for each feature.
+
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import f_oneway
+        import matplotlib.pyplot as plt
+
+        feature_num = [2, 3, 4, 5, 6, 7]
+
+        # Perform one-way ANOVA test for each feature
+        features = df_std_data_lb.columns[2:8]  # Exclude the 'Label' column
+        anova_results = {}
+        for feature in features:
+            labels = df_std_data_lb['label'].unique()
+            groups = [df_std_data_lb[df_std_data_lb['label'] == label][feature] for label in labels]
+            anova_result = f_oneway(*groups)
+            anova_results[feature] = anova_result
+
+        # Create box plots for each feature
+        for feature in features:
+            df_std_data_lb.boxplot(column=feature, by='label', grid=False)
+            plt.title(f'Box Plot for {feature}')
+            plt.suptitle('')  # Remove the default title
+            plt.show()
+
+        # Print ANOVA test results
+        for feature, result in anova_results.items():
+            feature_p_values.append(result.pvalue)
+            print(f'ANOVA Test for {feature}: F-statistic = {result.statistic}, p-value = {result.pvalue}')
+
+
+        feature_p_values
+
+        The p-values represent the significance of the relationship between each feature and the labels. Lower p-values indicate a stronger relationship.
+
+        # k-mean clustering using first five principal components data(from standardized data)
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from sklearn.cluster import KMeans
+
+        kmeans_pca = KMeans(n_clusters = 3)
+        kmeans_pca.fit(X_pca)
+
+        labels_pca = kmeans_pca.labels_
+
+        print(labels_pca)
+        plt.hist(labels_pca, bins = [-0.1,0.1,0.9,1.1,1.9,2.1])
+
+        clustering result analysis and interpret for pca_data using k-mean
+
+        reshaped_label = labels_pca.reshape(-1, 1)
+        pca_label_add_form = np.hstack((standardized_data, reshaped_label))
+        pca_label_add_form.shape
+
+        #next is to use chi-square test to test which feature is most relative to labels
+        import numpy as np
+        from scipy.stats import chi2_contingency
+
+        feature_num = [0,1] #only these two columns are categorical
+        feature_p_values = []
+
+        col_name_lb = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen', 'label']
+        df_pca_data_lb = pd.DataFrame(pca_label_add_form, columns = col_name_lb)# here not use, but when do anova test, I used framed data(not np.array)
+        # for categorical feature
+        for i in feature_num:
+            crosstable = pd.crosstab(pca_label_add_form[:, i],
+                                    pca_label_add_form[:, -1],
+                                    margins = False)
+            print("the " + str(i) + "th crosstable:\n")
+            print(crosstable)
+            print("---------------------")
+            stat, p, dof, expected = chi2_contingency(crosstable)
+            feature_p_values.append(p)
+
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import f_oneway
+        import matplotlib.pyplot as plt
+
+        feature_num = [2, 3, 4, 5, 6, 7]
+
+        # Perform one-way ANOVA test for each feature
+        features = df_pca_data_lb.columns[2:8]  # Exclude the 'Label' column
+        anova_results = {}
+        for feature in features:
+            labels = df_pca_data_lb['label'].unique()
+            groups = [df_pca_data_lb[df_pca_data_lb['label'] == label][feature] for label in labels]
+            anova_result = f_oneway(*groups)
+            anova_results[feature] = anova_result
+
+        # Create box plots for each feature
+        for feature in features:
+            df_std_data_lb.boxplot(column=feature, by='label', grid=False)
+            plt.title(f'Box Plot for {feature}')
+            plt.suptitle('')  # Remove the default title
+            plt.show()
+
+        # Print ANOVA test results
+        for feature, result in anova_results.items():
+            feature_p_values.append(result.pvalue)
+            print(f'ANOVA Test for {feature}: F-statistic = {result.statistic}, p-value = {result.pvalue}')
+
+        Compare these two labels.
+
+        type(labels)
+
+        comparison = labels == labels_pca
+        matching_count = np.sum(comparison)
+        print("matching count: " + str(matching_count))
+
+        print("matching percentage: " + str(418/440))
+
+        # hierarchical clustering using standardized data
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
+        # Generate labels for the data points(because I have 440 sample points)
+        sample_names = [f'Sample_{i}' for i in range(1, 441)]
+
+        # Perform hierarchical clustering
+        linkage_matrix = linkage(standardized_data, method='ward')  # can choose other linkage methods too
+
+        # Plot a dendrogram to visualize the hierarchical clustering
+        plt.figure(figsize=(12, 8))
+        dendrogram(linkage_matrix, labels=sample_names, orientation='top')
+        plt.title('Hierarchical Clustering Dendrogram')
+        plt.xlabel('Data Points')
+        plt.ylabel('Distance')
+        plt.xticks(rotation=90)  # Rotate x-axis labels for readability
+        plt.show()
+
+
+        # Use the Hierarchical clustering dendrogram to cluster
+
+        # Control number of clusters in the plot + add horizontal line.
+        dendrogram(linkage_matrix, color_threshold=26) # here clustering to 3 groups
+        plt.axhline(y=26, c='grey', lw=1, linestyle='dashed')
+
+        # Show the graph
+        plt.show()
+
+        from scipy.cluster import hierarchy
+
+        # method 1: lastp
+        hierarchy.dendrogram(linkage_matrix, truncate_mode = 'lastp', p=3 ) # -> will have 3 leaf at the bottom of the plot
+        plt.show()
+
+        # method 2: level
+        hierarchy.dendrogram(linkage_matrix, truncate_mode = 'level', p=3) # -> No more than ``p`` levels of the dendrogram tree are displayed.
+        plt.show()
+
+        from sklearn.cluster import AgglomerativeClustering
+
+        X = standardized_data
+        # Perform Agglomerative Clustering with 3 clusters
+        n_clusters = 3
+        agg_cluster = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
+        agg_labels = agg_cluster.fit_predict(X)
+        print(agg_labels)
+
+        # analyze clustering result
+        reshaped_label = agg_labels.reshape(-1, 1)
+        st_label_add_form = np.hstack((standardized_data, reshaped_label))
+        st_label_add_form.shape
+
+        #next is to use chi-square test to test which feature is most relative to labels
+        import numpy as np
+        from scipy.stats import chi2_contingency
+
+        feature_num = [0,1] #only these two columns are categorical
+        feature_p_values = []
+
+        col_name_lb = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen', 'label']
+        df_st_data_lb = pd.DataFrame(st_label_add_form, columns = col_name_lb)# here not use, but when do anova test, I used framed data(not np.array)
+        # for categorical feature
+        for i in feature_num:
+            crosstable = pd.crosstab(st_label_add_form[:, i],
+                                    st_label_add_form[:, -1],
+                                    margins = False)
+            print("the " + str(i) + "th crosstable:\n")
+            print(crosstable)
+            print("---------------------")
+            stat, p, dof, expected = chi2_contingency(crosstable)
+            feature_p_values.append(p)
+
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import f_oneway
+        import matplotlib.pyplot as plt
+
+        feature_num = [2, 3, 4, 5, 6, 7]
+
+        # Perform one-way ANOVA test for each feature
+        features = df_st_data_lb.columns[2:8]  # Exclude the 'Label' column
+        anova_results = {}
+        for feature in features:
+            labels = df_st_data_lb['label'].unique()
+            groups = [df_st_data_lb[df_st_data_lb['label'] == label][feature] for label in labels]
+            anova_result = f_oneway(*groups)
+            anova_results[feature] = anova_result
+
+        # Create box plots for each feature
+        for feature in features:
+            df_st_data_lb.boxplot(column=feature, by='label', grid=False)
+            plt.title(f'Box Plot for {feature}')
+            plt.suptitle('')  # Remove the default title
+            plt.show()
+
+        # Print ANOVA test results
+        for feature, result in anova_results.items():
+            feature_p_values.append(result.pvalue)
+            print(f'ANOVA Test for {feature}: F-statistic = {result.statistic}, p-value = {result.pvalue}')
+
+        feature_p_values
+
+
+        # hierarchical clustering using first five principal components data(from standardized data)
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
+        # Generate labels for the data points(because I have 440 sample points)
+        sample_names = [f'Sample_{i}' for i in range(1, 441)]
+
+        # Perform hierarchical clustering
+        linkage_matrix = linkage(X_pca, method='ward')  # can choose other linkage methods too
+
+        # Plot a dendrogram to visualize the hierarchical clustering
+        plt.figure(figsize=(12, 8))
+        dendrogram(linkage_matrix, labels=sample_names, orientation='top')
+        plt.title('Hierarchical Clustering Dendrogram')
+        plt.xlabel('Data Points')
+        plt.ylabel('Distance')
+        plt.xticks(rotation=90)  # Rotate x-axis labels for readability
+        plt.show()
+
+
+        # Use the Hierarchical clustering dendrogram to cluster
+
+        # Control number of clusters in the plot + add horizontal line.
+        dendrogram(linkage_matrix, color_threshold=26)
+        plt.axhline(y=26, c='grey', lw=1, linestyle='dashed')
+
+        # Show the graph
+        plt.show()
+
+        Truncate
+
+        from scipy.cluster import hierarchy
+
+        # method 1: lastp
+        hierarchy.dendrogram(linkage_matrix, truncate_mode = 'lastp', p=3 ) # -> you will have 3 leaf at the bottom of the plot
+        plt.show()
+
+        # method 2: level
+        hierarchy.dendrogram(linkage_matrix, truncate_mode = 'level', p=3) # -> No more than ``p`` levels of the dendrogram tree are displayed.
+        plt.show()
+
+        from sklearn.cluster import AgglomerativeClustering
+
+        X = X_pca
+        # Perform Agglomerative Clustering with 3 clusters
+        n_clusters = 3
+        agg_cluster = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
+        agg_labels_pca = agg_cluster.fit_predict(X)
+        print(agg_labels_pca)
+
+        # analyze clustering result
+        reshaped_label = agg_labels_pca.reshape(-1, 1)
+        pca_label_add_form = np.hstack((standardized_data, reshaped_label))
+        pca_label_add_form.shape
+
+        #next is to use chi-square test to test which feature is most relative to labels
+        import numpy as np
+        from scipy.stats import chi2_contingency
+
+        feature_num = [0,1] #only these two columns are categorical
+        feature_p_values = []
+
+        col_name_lb = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen', 'label']
+        df_pca_data_lb = pd.DataFrame(pca_label_add_form, columns = col_name_lb)# here not use, but when do anova test, I used framed data(not np.array)
+        # for categorical feature
+        for i in feature_num:
+            crosstable = pd.crosstab(pca_label_add_form[:, i],
+                                    pca_label_add_form[:, -1],
+                                    margins = False)
+            print("the " + str(i) + "th crosstable:\n")
+            print(crosstable)
+            print("---------------------")
+            stat, p, dof, expected = chi2_contingency(crosstable)
+            feature_p_values.append(p)
+
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import f_oneway
+        import matplotlib.pyplot as plt
+
+        feature_num = [2, 3, 4, 5, 6, 7]
+
+        # Perform one-way ANOVA test for each feature
+        features = df_pca_data_lb.columns[2:8]  # Exclude the 'Label' column
+        anova_results = {}
+        for feature in features:
+            labels = df_pca_data_lb['label'].unique()
+            groups = [df_pca_data_lb[df_pca_data_lb['label'] == label][feature] for label in labels]
+            anova_result = f_oneway(*groups)
+            anova_results[feature] = anova_result
+
+        # Create box plots for each feature
+        for feature in features:
+            df_std_data_lb.boxplot(column=feature, by='label', grid=False)
+            plt.title(f'Box Plot for {feature}')
+            plt.suptitle('')  # Remove the default title
+            plt.show()
+
+        # Print ANOVA test results
+        for feature, result in anova_results.items():
+            feature_p_values.append(result.pvalue)
+            print(f'ANOVA Test for {feature}: F-statistic = {result.statistic}, p-value = {result.pvalue}')
+
+        feature_p_values
+
+        comparison = agg_labels == agg_labels_pca
+        matching_count = np.sum(comparison)
+        print("matching count: " + str(matching_count))
+
+        print("matching percentage: " + str(421/440))
+
+        Use DBSCAN (Density-Based Spatial Clustering of Applications with Noise)
+
+        Parameters in DBSCAN:
+
+        eps (maximum distance between two samples for one to be considered as in the neighborhood of the other)
+
+        min_samples (the number of samples in a neighborhood for a point to be considered a core point)
+
+        Before carry out DBSCAN, I calculate elbow of KNN. ( number of the neighbours = minSample = 8 features * 2 = 16)
+
+        First, use standardized data.
+
+        import numpy as np
+        from sklearn.neighbors import NearestNeighbors
+        # n_neighbors = 17 as kneighbors function returns distance of point to itself. First column will be zero
+        nbrs = $(n_neighbors = 17).fit(standardized_data)
+        # Find the k-neighbors of a point
+        neigh_dist, neigh_ind = nbrs.kneighbors(standardized_data)
+        # sort the neighbor distances (lengths to points) in ascending order
+        # axis = 0 represents sort along first axis i.e. sort along row
+        sort_neigh_dist = np.sort(neigh_dist, axis = 0)
+
+        import matplotlib.pyplot as plt
+        k_dist = sort_neigh_dist[:, 16]
+        plt.plot(k_dist)
+        plt.ylabel("k-NN distance")
+        plt.xlabel("Sorted observations (16th NN)")
+        plt.show()
+
+        From the plot, the “knee” or “elbow” point (a threshold value where you see a sharp change) of the curve shows the optimal value of ε is 2-5. I select 2 to carry out DBSCAN.
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from sklearn.cluster import DBSCAN
+        from sklearn.datasets import make_moons
+
+        # Create a DBSCAN model
+        dbscan = DBSCAN(eps=2, min_samples=16) #how to adjust the parameters? cannot visualization, I don't know if I did it correctly.
+
+        # Fit the model to the data
+        dbscan.fit(standardized_data)
+
+        # Get cluster labels (-1 represents noise points)
+        labels = dbscan.labels_
+
+        print(labels)
+
+        # analyze clustering result
+        reshaped_label = labels.reshape(-1, 1)
+        st_label_add_form = np.hstack((standardized_data, reshaped_label))
+        st_label_add_form.shape
+
+        #next is to use chi-square test to test which feature is most relative to labels
+        import numpy as np
+        from scipy.stats import chi2_contingency
+
+        feature_num = [0,1] #only these two columns are categorical
+        feature_p_values = []
+
+        col_name_lb = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen', 'label']
+        df_st_data_lb = pd.DataFrame(st_label_add_form, columns = col_name_lb)# here not use, but when do anova test, I used framed data(not np.array)
+        # for categorical feature
+        for i in feature_num:
+            crosstable = pd.crosstab(st_label_add_form[:, i],
+                                    st_label_add_form[:, -1],
+                                    margins = False)
+            print("the " + str(i) + "th crosstable:\n")
+            print(crosstable)
+            print("---------------------")
+            stat, p, dof, expected = chi2_contingency(crosstable)
+            feature_p_values.append(p)
+
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import f_oneway
+        import matplotlib.pyplot as plt
+
+        feature_num = [2, 3, 4, 5, 6, 7]
+
+        # Perform one-way ANOVA test for each feature
+        features = df_st_data_lb.columns[2:8]  # Exclude the 'Label' column
+        anova_results = {}
+        for feature in features:
+            labels = df_st_data_lb['label'].unique()
+            groups = [df_st_data_lb[df_st_data_lb['label'] == label][feature] for label in labels]
+            anova_result = f_oneway(*groups)
+            anova_results[feature] = anova_result
+
+        # Create box plots for each feature
+        for feature in features:
+            df_st_data_lb.boxplot(column=feature, by='label', grid=False)
+            plt.title(f'Box Plot for {feature}')
+            plt.suptitle('')  # Remove the default title
+            plt.show()
+
+        # Print ANOVA test results
+        for feature, result in anova_results.items():
+            feature_p_values.append(result.pvalue)
+            print(f'ANOVA Test for {feature}: F-statistic = {result.statistic}, p-value = {result.pvalue}')
+
+
+        feature_p_values
+
+        Repeat using pca data.
+
+        # n_neighbors = 10+1=11 as kneighbors function returns distance of point to itself. First column will be zero
+        nbrs = NearestNeighbors(n_neighbors = 11).fit(X_pca)
+        # Find the k-neighbors of a point
+        neigh_dist, neigh_ind = nbrs.kneighbors(X_pca)
+        # sort the neighbor distances (lengths to points) in ascending order
+        # axis = 0 represents sort along first axis i.e. sort along row
+        sort_neigh_dist = np.sort(neigh_dist, axis = 0)
+
+        import matplotlib.pyplot as plt
+        k_dist = sort_neigh_dist[:, 10]
+        plt.plot(k_dist)
+        plt.ylabel("k-NN distance")
+        plt.xlabel("Sorted observations (16th NN)")
+        plt.show()
+
+        eps_pca is almost the same with pca with standardized eps.
+
+        # Create a DBSCAN model
+        dbscan_pca = DBSCAN(eps=2, min_samples=10) #how to adjust the parameters? cannot visualization, I don't know if I did it correctly.
+
+        # Fit the model to the data
+        dbscan_pca.fit(X_pca)
+
+        # Get cluster labels (-1 represents noise points)
+        labels_pca = dbscan_pca.labels_
+
+        print(labels_pca)
+
+        # analyze clustering result
+        reshaped_label = labels_pca.reshape(-1, 1)
+        pca_label_add_form = np.hstack((standardized_data, reshaped_label))
+        pca_label_add_form.shape
+
+        #next is to use chi-square test to test which feature is most relative to labels
+        import numpy as np
+        from scipy.stats import chi2_contingency
+
+        feature_num = [0,1] #only these two columns are categorical
+        feature_p_values = []
+
+        col_name_lb = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen', 'label']
+        df_pca_data_lb = pd.DataFrame(pca_label_add_form, columns = col_name_lb)# here not use, but when do anova test, I used framed data(not np.array)
+        # for categorical feature
+        for i in feature_num:
+            crosstable = pd.crosstab(pca_label_add_form[:, i],
+                                    pca_label_add_form[:, -1],
+                                    margins = False)
+            print("the " + str(i) + "th crosstable:\n")
+            print(crosstable)
+            print("---------------------")
+            stat, p, dof, expected = chi2_contingency(crosstable)
+            feature_p_values.append(p)
+
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import f_oneway
+        import matplotlib.pyplot as plt
+
+        feature_num = [2, 3, 4, 5, 6, 7]
+
+        # Perform one-way ANOVA test for each feature
+        features = df_pca_data_lb.columns[2:8]  # Exclude the 'Label' column
+        anova_results = {}
+        for feature in features:
+            labels = df_pca_data_lb['label'].unique()
+            groups = [df_pca_data_lb[df_pca_data_lb['label'] == label][feature] for label in labels]
+            anova_result = f_oneway(*groups)
+            anova_results[feature] = anova_result
+
+        # Create box plots for each feature
+        for feature in features:
+            df_std_data_lb.boxplot(column=feature, by='label', grid=False)
+            plt.title(f'Box Plot for {feature}')
+            plt.suptitle('')  # Remove the default title
+            plt.show()
+
+        # Print ANOVA test results
+        for feature, result in anova_results.items():
+            feature_p_values.append(result.pvalue)
+            print(f'ANOVA Test for {feature}: F-statistic = {result.statistic}, p-value = {result.pvalue}')
+
+        feature_p_values
+
+        compare two labes from standardized data and pca.
+
+        comparison = labels == labels_pca
+        matching_count = np.sum(comparison)
+        print("matching count: " + str(matching_count))
+
+        print("matching percentage: " + str(146/440))
+
+        Last I use Gaussian  mixture model to cluster.
+
+        With standardized data.
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from sklearn.mixture import GaussianMixture
+        from sklearn.datasets import make_blobs
+
+        # Create a Gaussian Mixture Model
+        n_clusters = 3  # Number of clusters you want to find
+        gmm = GaussianMixture(n_components=n_clusters)
+
+        # Fit the GMM to the data
+        gmm.fit(standardized_data)
+
+        # Predict cluster assignments for the data points
+        predicted_labels = gmm.predict(standardized_data)
+        print(predicted_labels)
+
+        # analyze clustering result
+        reshaped_label = predicted_labels.reshape(-1, 1)
+        st_label_add_form = np.hstack((standardized_data, reshaped_label))
+        st_label_add_form.shape
+
+        #next is to use chi-square test to test which feature is most relative to labels
+        import numpy as np
+        from scipy.stats import chi2_contingency
+
+        feature_num = [0,1] #only these two columns are categorical
+        feature_p_values = []
+
+        col_name_lb = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen', 'label']
+        df_st_data_lb = pd.DataFrame(st_label_add_form, columns = col_name_lb)# here not use, but when do anova test, I used framed data(not np.array)
+        # for categorical feature
+        for i in feature_num:
+            crosstable = pd.crosstab(st_label_add_form[:, i],
+                                    st_label_add_form[:, -1],
+                                    margins = False)
+            print("the " + str(i) + "th crosstable:\n")
+            print(crosstable)
+            print("---------------------")
+            stat, p, dof, expected = chi2_contingency(crosstable)
+            feature_p_values.append(p)
+
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import f_oneway
+        import matplotlib.pyplot as plt
+
+        feature_num = [2, 3, 4, 5, 6, 7]
+
+        # Perform one-way ANOVA test for each feature
+        features = df_st_data_lb.columns[2:8]  # Exclude the 'Label' column
+        anova_results = {}
+        for feature in features:
+            labels = df_st_data_lb['label'].unique()
+            groups = [df_st_data_lb[df_st_data_lb['label'] == label][feature] for label in labels]
+            anova_result = f_oneway(*groups)
+            anova_results[feature] = anova_result
+
+        # Create box plots for each feature
+        for feature in features:
+            df_st_data_lb.boxplot(column=feature, by='label', grid=False)
+            plt.title(f'Box Plot for {feature}')
+            plt.suptitle('')  # Remove the default title
+            plt.show()
+
+        # Print ANOVA test results
+        for feature, result in anova_results.items():
+            feature_p_values.append(result.pvalue)
+            print(f'ANOVA Test for {feature}: F-statistic = {result.statistic}, p-value = {result.pvalue}')
+        feature_p_values
+
+        With pca data.
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from sklearn.mixture import GaussianMixture
+        from sklearn.datasets import make_blobs
+
+        # Create a Gaussian Mixture Model
+        n_clusters = 3  # Number of clusters you want to find
+        gmm_pca = GaussianMixture(n_components=n_clusters)
+
+        # Fit the GMM to the data
+        gmm_pca.fit(X_pca)
+
+        # Predict cluster assignments for the data points
+        predicted_labels_pca = gmm_pca.predict(X_pca)
+        print(predicted_labels_pca)
+
+        # analyze clustering result
+        reshaped_label = predicted_labels_pca.reshape(-1, 1)
+        pca_label_add_form = np.hstack((standardized_data, reshaped_label))
+        pca_label_add_form.shape
+
+        #next is to use chi-square test to test which feature is most relative to labels
+        import numpy as np
+        from scipy.stats import chi2_contingency
+
+        feature_num = [0,1] #only these two columns are categorical
+        feature_p_values = []
+
+        col_name_lb = ['Channel', 'Region', 'Fresh', 'Milk', 'Grocery', 'Frozen', 'DetergentsPaper', 'Delicatessen', 'label']
+        df_pca_data_lb = pd.DataFrame(pca_label_add_form, columns = col_name_lb)# here not use, but when do anova test, I used framed data(not np.array)
+        # for categorical feature
+        for i in feature_num:
+            crosstable = pd.crosstab(pca_label_add_form[:, i],
+                                    pca_label_add_form[:, -1],
+                                    margins = False)
+            print("the " + str(i) + "th crosstable:\n")
+            print(crosstable)
+            print("---------------------")
+            stat, p, dof, expected = chi2_contingency(crosstable)
+            feature_p_values.append(p)
+
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import f_oneway
+        import matplotlib.pyplot as plt
+
+        feature_num = [2, 3, 4, 5, 6, 7]
+
+        # Perform one-way ANOVA test for each feature
+        features = df_pca_data_lb.columns[2:8]  # Exclude the 'Label' column
+        anova_results = {}
+        for feature in features:
+            labels = df_pca_data_lb['label'].unique()
+            groups = [df_pca_data_lb[df_pca_data_lb['label'] == label][feature] for label in labels]
+            anova_result = f_oneway(*groups)
+            anova_results[feature] = anova_result
+
+        # Create box plots for each feature
+        for feature in features:
+            df_std_data_lb.boxplot(column=feature, by='label', grid=False)
+            plt.title(f'Box Plot for {feature}')
+            plt.suptitle('')  # Remove the default title
+            plt.show()
+
+        # Print ANOVA test results
+        for feature, result in anova_results.items():
+            feature_p_values.append(result.pvalue)
+            print(f'ANOVA Test for {feature}: F-statistic = {result.statistic}, p-value = {result.pvalue}')
+
+
+        comparison = predicted_labels == predicted_labels_pca
+        matching_count = np.sum(comparison)
+        print("matching count: " + str(matching_count))
+
+        print("matching percentage: " + str(225/440))
+
+        </pre>
+
+        
+
+        <!-- Back to Portfolio Button -->
+        <a href="index.html#portfolio" class="button">Back to Portfolio</a>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
 </body>
 </html>
+
